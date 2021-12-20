@@ -3,34 +3,33 @@ from nn_utils import *
 """
     use:
         layer_dims = [n_x, n_h1, n_h2, n_y]
-        nn = NeuralNetwork(layer_dims)
-        nn.train(X, Y, )
+        params, costs = NeuralNetwork().train(X, Y, layers_dims)
 """
 
 class NeuralNetwork:
-    def __init__(self, layer_dims, learning_rate=0.1):
-        self.learning_rate = learning_rate
-        self.layer_dims = layer_dims
-        self.parameters = {}
+    def __init__(self):
+        pass
 
-    def initialize_parameters(self):
+    def initialize_parameters(self, layers_dims):
         """
         Returns:
         parameters -- python dictionary containing your parameters "W1", "b1", ..., "WL", "bL":
                         Wl -- weight matrix of shape (layer_dims[l], layer_dims[l-1])
                         bl -- bias vector of shape (layer_dims[l], 1)
         """
-
-        L = len(self.layer_dims) # number of layers in the network
+        parameters = {}
+        L = len(layers_dims) # number of layers in the network
 
         for l in range(1, L):
-            self.parameters['W' + str(l)] = np.random.randn(self.layer_dims[l], self.layer_dims[l-1]) / np.sqrt(self.layer_dims[l-1]) #*0.01
-            self.parameters['b' + str(l)] = np.zeros((self.layer_dims[l], 1))
+            parameters['W' + str(l)] = np.random.randn(layers_dims[l], layers_dims[l-1]) / np.sqrt(layers_dims[l-1]) #*0.01
+            parameters['b' + str(l)] = np.zeros((layers_dims[l], 1))
 
-            assert(self.parameters['W' + str(l)].shape == (self.layer_dims[l], self.layer_dims[l-1]))
-            assert(self.parameters['b' + str(l)].shape == (self.layer_dims[l], 1))
+            assert(parameters['W' + str(l)].shape == (layers_dims[l], layers_dims[l-1]))
+            assert(parameters['b' + str(l)].shape == (layers_dims[l], 1))
 
-    def forward_propagation(self, X):
+        return parameters
+
+    def forward_propagation(self, X, parameters):
         """
         forward propagation for the [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID computation
         
@@ -45,15 +44,14 @@ class NeuralNetwork:
 
         caches = []
         A = X
-        L = len(self.parameters) // 2                  # number of layers in the neural network
-        # Implement [LINEAR -> RELU]*(L-1). Add "cache" to the "caches" list.
+        L = len(parameters) // 2                  # number of layers in the neural network
         # The for loop starts at 1 because layer 0 is the input
         for l in range(1, L):
             A_prev = A 
-            A, cache = linear_activation_forward(A_prev, self.parameters['W' + str(l)], self.parameters['b' + str(l)], "relu")
+            A, cache = linear_activation_forward(A_prev, parameters['W' + str(l)], parameters['b' + str(l)], "relu")
             caches.append(cache)
             
-        AL, cache = linear_activation_forward(A, self.parameters['W' + str(L)], self.parameters['b' + str(L)], "sigmoid")
+        AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], "sigmoid")
         caches.append(cache)
             
         return AL, caches
@@ -118,7 +116,7 @@ class NeuralNetwork:
 
         return grads
 
-    def update_parameters(self, grads):
+    def update_parameters(self, params, grads, learning_rate):
         """
         Update parameters using gradient descent
         
@@ -131,15 +129,17 @@ class NeuralNetwork:
                     parameters["W" + str(l)] = ... 
                     parameters["b" + str(l)] = ...
         """
-        L = len(self.parameters) // 2 # number of layers in the neural network
+
+        parameters = params.copy()
+        L = len(parameters) // 2 # number of layers in the neural network
 
         for l in range(L):
-            self.parameters["W" + str(l+1)] = self.parameters["W" + str(l+1)] - self.learning_rate * grads["dW" + str(l+1)] 
-            self.parameters["b" + str(l+1)] = self.parameters["b" + str(l+1)] - self.learning_rate * grads["db" + str(l+1)]
+            parameters["W" + str(l+1)] = parameters["W" + str(l+1)] - learning_rate * grads["dW" + str(l+1)] 
+            parameters["b" + str(l+1)] = parameters["b" + str(l+1)] - learning_rate * grads["db" + str(l+1)]
 
-        return self.parameters
+        return parameters
 
-    def train(self, X, Y, num_iterations = 3000, print_cost=False):
+    def train(self, X, Y, layers_dims, learning_rate, num_iterations = 3000, print_cost=False):
         """
         Train the Neural network to learn parameters.
         
@@ -154,36 +154,37 @@ class NeuralNetwork:
         Returns:
         parameters -- parameters learnt by the model. They can then be used to predict.
         """
-        self.initialize_parameters()
+        parameters = self.initialize_parameters(layers_dims)
 
         costs = []                         # keep track of cost
         
-
         for i in range(0, num_iterations):
-            AL, caches = self.forward_propagation(X)
+            AL, caches = self.forward_propagation(X, parameters)
             cost = self.compute_cost(AL, Y)
             grads = self.backward_propagation(AL, Y, caches)
-            self.update_parameters(grads)
+            parameters = self.update_parameters(parameters, grads, learning_rate)
             
             if print_cost and i % 100 == 0 or i == num_iterations - 1:
                 print("Cost after iteration {}: {}".format(i, np.squeeze(cost)))
             if i % 100 == 0 or i == num_iterations:
                 costs.append(cost)
         
-        return self.parameters, costs
+        return parameters, costs
     
-    def predict(self, X):
+    def predict(self, X, parameters):
         """
         Predict the results of the neural network.
         
         Arguments:
         X -- data set of examples you would like to label
+        parameters -- learned parameters of the model
+
         Returns:
         p -- predictions for the given dataset X
         """
         
         # Forward propagation
-        probas, _ = self.forward_propagation(X)
+        probas, _ = self.forward_propagation(X, parameters)
 
         # convert probas to 0/1 predictions
         p = np.where(probas > 0.5, 1, 0)

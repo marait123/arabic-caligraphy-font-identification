@@ -17,7 +17,17 @@ def load_data():
 def binraization(img):
     blur = cv2.GaussianBlur(img,(3,3),0)
     _, binaryImage = cv2.threshold(blur,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    binaryImage = invertBlackBackground(binaryImage)
     return binaryImage
+
+def invertBlackBackground(binaryImage):
+    numOfZeros = binaryImage[binaryImage==0].size
+    numOfOnes = binaryImage.size - numOfZeros
+
+    if numOfZeros > numOfOnes:
+        binaryImage = 255 - binaryImage
+
+    return binaryImage        
 
 def split_data(X, Y):
     X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.8)

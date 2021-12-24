@@ -12,7 +12,7 @@ def load_data():
             img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
             x.append(img)
             y.append(classNum)
-    return np.asarray(x, dtype=object), np.asarray(y, dtype=object)
+    return np.asarray(x, dtype=object), np.asarray(y)
 
 def binraization(img):
     blur = cv2.GaussianBlur(img,(3,3),0)
@@ -30,6 +30,6 @@ def invertBlackBackground(binaryImage):
     return binaryImage        
 
 def split_data(X, Y):
-    X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.8)
+    X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.6)
     X_valid, X_test, Y_valid, Y_test = train_test_split(X_rem, Y_rem, train_size=0.5)
     return X_train, Y_train, X_valid, Y_valid, X_test, Y_test

@@ -48,10 +48,12 @@ class NeuralNetwork:
         # The for loop starts at 1 because layer 0 is the input
         for l in range(1, L):
             A_prev = A 
+            print(A_prev.shape)
             A, cache = linear_activation_forward(A_prev, parameters['W' + str(l)], parameters['b' + str(l)], "relu")
             caches.append(cache)
             
         AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], "sigmoid")
+        print(AL.shape)
         caches.append(cache)
             
         return AL, caches
@@ -71,8 +73,9 @@ class NeuralNetwork:
         m = Y.shape[1]
 
         cost = (1./m) * (-np.dot(Y,np.log(AL).T) - np.dot(1-Y, np.log(1-AL).T))
-        
+        print(cost.shape)
         cost = np.squeeze(cost)      # To make sure your cost's shape is what we expect (e.g. this turns [[17]] into 17).
+        print(cost.shape)
         assert(cost.shape == ())
 
         return cost
@@ -139,7 +142,7 @@ class NeuralNetwork:
 
         return parameters
 
-    def train(self, X, Y, layers_dims, learning_rate, num_iterations = 3000, print_cost=False):
+    def train(self, X, Y, layers_dims, learning_rate=0.1, num_iterations = 3000, print_cost=False):
         """
         Train the Neural network to learn parameters.
         

@@ -33,3 +33,16 @@ def split_data(X, Y):
     X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.6)
     X_valid, X_test, Y_valid, Y_test = train_test_split(X_rem, Y_rem, train_size=0.5)
     return X_train, Y_train, X_valid, Y_valid, X_test, Y_test
+
+
+def determine_background(img):
+    wMax = np.max(np.sum(img == 255, axis=0))
+    bMax = np.max(np.sum(img == 0, axis=0))
+    if wMax > bMax:
+        return 1
+    elif bMax > wMax:
+        return 0
+    else:
+        return -1
+    
+    

@@ -29,7 +29,7 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test, epochs=1
         loss.backward()
         optimizer.step()
         
-        if epoch % 20 == 0:
+        if epoch % 10 == 0:
             train_loss = loss.item() / len(labels)
             train_losses.append(train_loss)
             

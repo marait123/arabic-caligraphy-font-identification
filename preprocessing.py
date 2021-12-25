@@ -3,6 +3,7 @@ import cv2
 import glob
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from skimage.morphology import skeletonize
 
 def load_data():
     x = []
@@ -28,6 +29,49 @@ def invertBlackBackground(binaryImage):
         binaryImage = 255 - binaryImage
 
     return binaryImage        
+
+def diacriticsSegmentationClustering(binaryImage):
+    numLabels, labels, stats, _ = cv2.connectedComponentsWithStats(1-binaryImage, 8, cv2.CV_32S)
+    areas = stats[:, cv2.CC_STAT_AREA]
+
+    mue1 = np.mean(areas[1:])
+    mue2 = mue1/4
+
+    c1, c2 = [], []
+
+    for i in range(1, numLabels):    
+        area = stats[i, cv2.CC_STAT_AREA]
+        d1 = np.abs(mue1-area)
+        d2 = np.abs(mue2-area)
+        if d1 < d2:
+            c1.append(i)
+        else:
+            c2.append(i)
+
+    textOnly = np.where(np.isin(labels, c1), 0, 1).astype(binaryImage.dtype)
+    diacritics = np.where(np.isin(labels, c2), 0, 1).astype(binaryImage.dtype)
+    return textOnly, diacritics
+
+def diacriticsSegmentationFloodFill(binaryImage):
+    diacritics = binaryImage.copy()
+    
+    baseline_idx = ((1-diacritics).sum(axis=1)).argmax()
+    
+    starts = np.array((diacritics[baseline_idx, :-1] != 0) & (diacritics[baseline_idx, 1:] == 0))
+    seeds = np.where(starts)[0] + 1
+
+    for seed in seeds:
+        cv2.floodFill(diacritics, None, (seed, baseline_idx), 1)
+
+    textOnly = binaryImage + (1-diacritics)
+
+    return textOnly, diacritics
+
+def extractImagesSet(binaryImage):
+    edges = 1 - cv2.Canny(binaryImage*255, 50, 150)//255
+    skeleton = 1-skeletonize(1-binaryImage)
+    textOnly, diacritics = diacriticsSegmentationFloodFill(binaryImage)
+    return edges, skeleton, diacritics, textOnly
 
 def split_data(X, Y):
     X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.6)

@@ -1,6 +1,14 @@
 import cv2
 import numpy as np
 
+def horizontalProfileProjection(binaryImage, noOfBins):
+    hpp = np.sum(1-binaryImage//255, axis=1)
+    if hpp.size < noOfBins:
+        noOfBins = hpp.size
+    hpp = np.array([np.mean(bn) for bn in np.array_split(hpp, noOfBins)])
+    hpp /= np.max(hpp)
+    return hpp
+
 def extract_hog_features(img,target_img_size=(256, 128)):
     """
     You won't implement anything in this function. You just need to understand it 

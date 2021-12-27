@@ -5,6 +5,25 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from skimage.morphology import skeletonize
 
+def show_images(images,titles=None):
+    #This function is used to show image(s) with titles by sending an array of images and an array of associated titles..
+    # images[0] will be drawn with the title titles[0] if exists
+    # You aren't required to understand this function, use it as-is.
+    n_ims = len(images)
+    if titles is None: titles = ['(%d)' % i for i in range(1,n_ims + 1)]
+    fig = plt.figure()
+    n = 1
+    for image,title in zip(images,titles):
+        a = fig.add_subplot(1,n_ims,n)
+        if image.ndim == 2: 
+            plt.gray()
+        plt.imshow(image)
+        a.set_title(title)
+        plt.axis('off')
+        n += 1
+    fig.set_size_inches(np.array(fig.get_size_inches()) * n_ims)
+    plt.show() 
+
 def load_data():
     x = []
     y = []
@@ -67,11 +86,13 @@ def diacriticsSegmentationFloodFill(binaryImage):
 
     return textOnly, diacritics
 
+
 def extractImagesSet(binaryImage):
     edges = 1 - cv2.Canny(binaryImage*255, 50, 150)//255
     skeleton = 1-skeletonize(1-binaryImage)
     textOnly, diacritics = diacriticsSegmentationFloodFill(binaryImage)
     return edges, skeleton, textOnly, diacritics
+
 
 def split_data(X, Y):
     X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.6)

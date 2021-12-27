@@ -22,10 +22,10 @@ def binraization(img):
     return binaryImage
 
 def invertBlackBackground(binaryImage):
-    numOfZeros = binaryImage[binaryImage==0].size
-    numOfOnes = binaryImage.size - numOfZeros
+    # numOfZeros = binaryImage[binaryImage==0].size
+    # numOfOnes = binaryImage.size - numOfZeros
 
-    if numOfZeros > numOfOnes:
+    if determine_background(binaryImage) == 0:
         binaryImage = 255 - binaryImage
 
     return binaryImage        
@@ -71,7 +71,7 @@ def extractImagesSet(binaryImage):
     edges = 1 - cv2.Canny(binaryImage*255, 50, 150)//255
     skeleton = 1-skeletonize(1-binaryImage)
     textOnly, diacritics = diacriticsSegmentationFloodFill(binaryImage)
-    return edges, skeleton, diacritics, textOnly
+    return edges, skeleton, textOnly, diacritics
 
 def split_data(X, Y):
     X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.6)

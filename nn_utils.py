@@ -8,7 +8,7 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test, epochs=1
     criterion = nn.NLLLoss()
 
     optimizer = optim.Adam(model.parameters(), lr)
-
+    
     model.to(device)
 
     train_losses, validation_losses, test_losses = [], [], []
@@ -19,7 +19,8 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test, epochs=1
         optimizer.zero_grad()
 
         log_ps = model(inputs.float())
-        loss = criterion(log_ps, labels)
+        
+        loss = criterion(log_ps, labels.long())
 
         loss.backward()
         optimizer.step()
@@ -32,13 +33,13 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test, epochs=1
                 model.eval()
                 inputs, labels = X_valid.to(device), Y_valid.to(device)
                 log_ps = model(inputs.float())
-                loss = criterion(log_ps, labels)
+                loss = criterion(log_ps, labels.long())
                 valid_loss = loss.item()/len(labels)
                 validation_losses.append(valid_loss)
 
                 inputs, labels = X_test.to(device), Y_test.to(device)
                 log_ps = model(inputs.float())
-                loss = criterion(log_ps, labels)
+                loss = criterion(log_ps, labels.long())
                 test_loss = loss.item()/len(labels)
                 test_losses.append(test_loss)
             

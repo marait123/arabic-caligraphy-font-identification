@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import glob
 import matplotlib.pyplot as plt
+import os, shutil
 from sklearn.model_selection import train_test_split
 from skimage.morphology import skeletonize
 
@@ -29,10 +30,9 @@ def load_data():
     y = []
     for classNum in range(1, 10):
         for filename in sorted(glob.glob(f'ACdata_base/{classNum}/*.jpg')):
-            img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-            x.append(img)
+            x.append(filename)
             y.append(classNum)
-    return np.asarray(x, dtype=object), np.asarray(y)
+    return np.asarray(x), np.asarray(y)
 
 def binraization(img):
     blur = cv2.GaussianBlur(img,(3,3),0)
@@ -94,10 +94,29 @@ def extractImagesSet(binaryImage):
     return edges, skeleton, textOnly, diacritics
 
 
+def copyFiles(X, Y, dir_name):
+    os.mkdir(dir_name) 
+
+    for fileName in X:
+        shutil.copy(fileName, dir_name)
+
 def split_data(X, Y):
     X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.6)
     X_valid, X_test, Y_valid, Y_test = train_test_split(X_rem, Y_rem, train_size=0.5)
-    return X_train, Y_train, X_valid, Y_valid, X_test, Y_test
+
+    try: 
+        os.mkdir('data') 
+    except: 
+        shutil.rmtree('data')
+        os.mkdir('data')
+
+    copyFiles(X_train, Y_train, 'data/train')
+    copyFiles(X_valid, Y_valid, 'data/valid')
+    copyFiles(X_test, Y_test, 'data/test')
+
+    np.sort(Y_train).tofile('data/train_labels.csv', sep = '\n')
+    np.sort(Y_valid).tofile('data/valid_labels.csv', sep = '\n')
+    np.sort(Y_test).tofile('data/test_labels.csv', sep = '\n')
 
 
 def determine_background(img):

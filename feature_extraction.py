@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from preprocessing import show_images
 
 def horizontalProfileProjection(binaryImage, noOfBins):
     hpp = np.sum(1-binaryImage//255, axis=1)
@@ -10,10 +11,7 @@ def horizontalProfileProjection(binaryImage, noOfBins):
     return hpp
 
 def extract_hog_features(img,target_img_size=(256, 128)):
-    """
-    You won't implement anything in this function. You just need to understand it 
-    and understand its parameters (i.e win_size, cell_size, ... etc)
-    """
+    
     img = cv2.resize(img, target_img_size)
     
     cell_size = (32, 32)
@@ -37,7 +35,7 @@ def extract_EOH(img, bins = 360):
     dx = dx.astype("float32")
     dy = dy.astype("float32")
     gradient_magnitude = cv2.magnitude(dy, dx)
-
+    
     gradient_orientation = cv2.phase(dx, dy, angleInDegrees=True)
     eoh = np.histogram(gradient_orientation, bins=bins, range=(0, 360), weights=gradient_magnitude, density=True)
     return eoh[0]

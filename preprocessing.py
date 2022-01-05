@@ -95,10 +95,12 @@ def extractImagesSet(binaryImage):
 
 
 def copyFiles(X, Y, dir_name):
-    os.mkdir(dir_name) 
+    os.mkdir(dir_name)
+    for i in range(1, 10):
+        os.mkdir(f'{dir_name}/{str(i)}')
 
-    for fileName in X:
-        shutil.copy(fileName, dir_name)
+    for i in range(Y.size):
+        shutil.copy(X[i], f'{dir_name}/{Y[i]}')
 
 def split_data(X, Y):
     X_train, X_rem, Y_train, Y_rem = train_test_split(X, Y, train_size=0.6)
@@ -113,10 +115,6 @@ def split_data(X, Y):
     copyFiles(X_train, Y_train, 'data/train')
     copyFiles(X_valid, Y_valid, 'data/valid')
     copyFiles(X_test, Y_test, 'data/test')
-
-    np.sort(Y_train).tofile('data/train_labels.csv', sep = '\n')
-    np.sort(Y_valid).tofile('data/valid_labels.csv', sep = '\n')
-    np.sort(Y_test).tofile('data/test_labels.csv', sep = '\n')
 
 
 def determine_background(img):

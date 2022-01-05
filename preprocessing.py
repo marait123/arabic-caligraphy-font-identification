@@ -30,9 +30,10 @@ def load_data():
     y = []
     for classNum in range(1, 10):
         for filename in sorted(glob.glob(f'ACdata_base/{classNum}/*.jpg')):
-            x.append(filename)
+            img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+            x.append(img)
             y.append(classNum)
-    return np.asarray(x), np.asarray(y)
+    return np.asarray(x, dtype=object), np.asarray(y)
 
 def binraization(img):
     blur = cv2.GaussianBlur(img,(3,3),0)
@@ -90,7 +91,7 @@ def diacriticsSegmentationFloodFill(binaryImage):
 def extractImagesSet(binaryImage):
     edges = 1 - cv2.Canny(binaryImage*255, 50, 150)//255
     skeleton = 1-skeletonize(1-binaryImage)
-    textOnly, diacritics = diacriticsSegmentationFloodFill(binaryImage)
+    textOnly, diacritics = diacriticsSegmentationClustering(binaryImage)
     return edges, skeleton, textOnly, diacritics
 
 

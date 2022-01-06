@@ -8,15 +8,17 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, va
 
     criterion = nn.NLLLoss()
 
-    optimizer = optim.Adam(model.parameters(), lr, weight_decay=1e-4)
-    
+    optimizer = optim.Adam(model.parameters(), lr, weight_decay=0.6e-4)
+    # optimizer = optim.SGD(model.parameters(), lr, momentum=0.999)
     model.to(device)
 
     train_losses, validation_losses= [], []
     train_losses = []
 
-    with open('evaluation.json', 'r') as file:
-        best_evaluation = json.load(file)
+    # with open('evaluation.json', 'r') as file:
+    #     best_evaluation = json.load(file)
+
+    best_evaluation = {'validation_loss':10, 'validation_accuracy':0}
 
     for epoch in range(epochs):
         inputs, labels = X_train.to(device), Y_train.to(device)
@@ -50,10 +52,10 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, va
                 valid_accuracy = nn_accuracy(predictions, Y_valid)
 
                 if valid_loss < best_evaluation['validation_loss']:
-                    print(f'loss = {valid_loss}, accuracy = {valid_accuracy*100}')
+                #     print(f'loss = {valid_loss}, accuracy = {valid_accuracy*100}')
                     best_evaluation['validation_loss'] = valid_loss
                     best_evaluation['validation_accuracy'] = valid_accuracy*100
-                    torch.save(model.state_dict(), 'model.pth')
+                #     torch.save(model.state_dict(), 'model.pth')
 
             
             model.train()
@@ -63,8 +65,8 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, va
                     f"Training Loss: {train_loss:0.3f}, training accuracy {train_accuracy*100:0.3f}%",
                     f"validation Loss: {valid_loss:0.3f}, validation accuracy {valid_accuracy*100:0.3f}%")
     
-    with open("evaluation.json", "w") as outfile:
-        json.dump(best_evaluation, outfile)
+    # with open("evaluation.json", "w") as outfile:
+    #     json.dump(best_evaluation, outfile)
 
     return train_losses, validation_losses
 

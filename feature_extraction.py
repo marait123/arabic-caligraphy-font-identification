@@ -90,3 +90,7 @@ def lpq(img,winSize=3,freqestim=1,mode='nh'):
         LPQdesc=LPQdesc/LPQdesc.sum()
 
     return LPQdesc
+
+def extractFeaturesFromImage(img):
+    features = lpq(img)
+    return features

@@ -33,22 +33,7 @@ def load_data():
             # img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
             x.append(filename)
             y.append(classNum)
-    return np.asarray(x), np.asarray(y)
-
-def binraization(img):
-    blur = cv2.GaussianBlur(img,(3,3),0)
-    _, binaryImage = cv2.threshold(blur,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    binaryImage = invertBlackBackground(binaryImage)
-    return binaryImage
-
-def invertBlackBackground(binaryImage):
-    # numOfZeros = binaryImage[binaryImage==0].size
-    # numOfOnes = binaryImage.size - numOfZeros
-
-    if determine_background(binaryImage) == 0:
-        binaryImage = 255 - binaryImage
-
-    return binaryImage        
+    return np.asarray(x, dtype=object), np.asarray(y)
 
 def diacriticsSegmentationClustering(binaryImage):
     numLabels, labels, stats, _ = cv2.connectedComponentsWithStats(1-binaryImage, 8, cv2.CV_32S)
@@ -128,4 +113,13 @@ def determine_background(img):
     else:
         return -1
     
+
+def preprocessImage(img):
+    blur = cv2.GaussianBlur(img,(3,3),0)
     
+    _, binaryImage = cv2.threshold(blur,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
+    if determine_background(binaryImage) == 0:
+        binaryImage = 255 - binaryImage
+    
+    return binaryImage

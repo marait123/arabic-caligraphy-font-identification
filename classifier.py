@@ -2,6 +2,17 @@ import torch
 from torch import nn, optim
 import json
 
+def getNNModelStructure(featuresNo):
+    model = nn.Sequential(nn.Linear(featuresNo, 1024),
+                    nn.ReLU(),
+                    nn.Dropout(0.2),
+                    nn.Linear(1024, 512),
+                    nn.ReLU(),
+                    nn.Dropout(0.2),
+                    nn.Linear(512, 9),
+                    nn.LogSoftmax(dim=1))
+    return model
+
 def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, validate_every = 100, debug=False):
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -86,8 +97,6 @@ def nn_predict(model, features):
 def nn_accuracy(predictions, labels):
     correct = (predictions == labels).sum().item()
     return correct/len(labels)
-    
 
-    
-
-
+def predict(model, features):
+    return nn_predict(model, features)

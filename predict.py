@@ -1,7 +1,6 @@
 import sys
 import os
 import cv2
-from torch.functional import Tensor
 from preprocessing import preprocessImage
 from feature_extraction import extractFeaturesFromImage
 from classifier import getNNModelStructure, predict
@@ -18,7 +17,6 @@ def process_data(input_path, output_path):
         print('ERROR: input path is not correct')
         sys.exit()
     
-
     try:
         resultsFile = open(f"{output_path}/results.txt", "w")
         timeFile = open(f"{output_path}/times.txt", "w")
@@ -26,7 +24,7 @@ def process_data(input_path, output_path):
         print("output path isn't correct")
         sys.exit()
     
-
+    
     files.sort()
 
     model = getNNModelStructure(featuresNo)
@@ -41,8 +39,6 @@ def process_data(input_path, output_path):
     _ = predict(model, torch.zeros(1, featuresNo))
 
     for file in files:
-        _, extension = os.path.splitext(file)
-        # if extension.lower() != '.png':
         img = cv2.imread(f'{input_path}/{file}', cv2.IMREAD_GRAYSCALE)
         t1 = time.time()
         preprocessed = preprocessImage(img)

@@ -1,6 +1,5 @@
 import torch
 from torch import nn, optim
-import json
 
 def getNNModelStructure(featuresNo):
     model = nn.Sequential(nn.Linear(featuresNo, 1024),
@@ -20,7 +19,6 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, va
     criterion = nn.NLLLoss()
 
     optimizer = optim.Adam(model.parameters(), lr, weight_decay=0.6e-4)
-    # optimizer = optim.SGD(model.parameters(), lr, momentum=0.999)
     model.to(device)
 
     train_losses, validation_losses= [], []
@@ -38,7 +36,6 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, va
 
         log_ps = model(inputs.float())
 
-        print(log_ps)
         loss = criterion(log_ps, labels.long())
         loss.backward()
         optimizer.step()

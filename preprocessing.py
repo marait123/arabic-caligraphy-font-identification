@@ -7,9 +7,6 @@ from sklearn.model_selection import train_test_split
 from skimage.morphology import skeletonize
 
 def show_images(images,titles=None):
-    #This function is used to show image(s) with titles by sending an array of images and an array of associated titles..
-    # images[0] will be drawn with the title titles[0] if exists
-    # You aren't required to understand this function, use it as-is.
     n_ims = len(images)
     if titles is None: titles = ['(%d)' % i for i in range(1,n_ims + 1)]
     fig = plt.figure()
@@ -30,8 +27,8 @@ def load_data():
     y = []
     for classNum in range(1, 10):
         for filename in sorted(glob.glob(f'ACdata_base/{classNum}/*.jpg')):
-            img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-            x.append(img)
+            # img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+            x.append(filename)
             y.append(classNum)
     return np.asarray(x, dtype=object), np.asarray(y)
 
@@ -81,18 +78,13 @@ def extractImagesSet(binaryImage):
 
 def getAreaOfInterest(originalImage):
     img = originalImage.copy()
-#     show_images([img],["original"])
 
     edges = cv2.Canny(img, 30, 150)
-    # show_images([edges], ['edges'])
-
 
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     dilate = cv2.dilate(edges, kernel, iterations=1)//255
-    # show_images([dilate], ['dilate'])
 
     threshold = 10
-
 
     hp = (dilate).sum(axis=1)
     vp = (dilate).sum(axis=0)

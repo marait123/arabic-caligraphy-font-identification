@@ -33,13 +33,13 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, va
 
     for epoch in range(epochs):
         inputs, labels = X_train.to(device), Y_train.to(device)
-        
+
         optimizer.zero_grad()
 
         log_ps = model(inputs.float())
-        
-        loss = criterion(log_ps, labels.long())
 
+        print(log_ps)
+        loss = criterion(log_ps, labels.long())
         loss.backward()
         optimizer.step()
         

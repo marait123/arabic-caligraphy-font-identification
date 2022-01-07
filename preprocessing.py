@@ -30,8 +30,8 @@ def load_data():
     y = []
     for classNum in range(1, 10):
         for filename in sorted(glob.glob(f'ACdata_base/{classNum}/*.jpg')):
-            # img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-            x.append(filename)
+            img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+            x.append(img)
             y.append(classNum)
     return np.asarray(x, dtype=object), np.asarray(y)
 
@@ -79,6 +79,33 @@ def extractImagesSet(binaryImage):
     textOnly, diacritics = diacriticsSegmentationClustering(binaryImage)
     return edges, skeleton, textOnly, diacritics
 
+def getAreaOfInterest(originalImage):
+    img = originalImage.copy()
+#     show_images([img],["original"])
+
+    edges = cv2.Canny(img, 30, 150)
+    # show_images([edges], ['edges'])
+
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    dilate = cv2.dilate(edges, kernel, iterations=1)//255
+    # show_images([dilate], ['dilate'])
+
+    threshold = 10
+
+
+    hp = (dilate).sum(axis=1)
+    vp = (dilate).sum(axis=0)
+
+    h_occurances = np.where(hp>threshold)[0]
+    v_occurances = np.where(vp>threshold)[0]
+
+    rs, re = h_occurances[0], h_occurances[-1]
+    cs, ce = v_occurances[0], v_occurances[-1]
+
+    cropped = img[rs:re+1, cs:ce+1]
+    
+    return cropped
 
 def copyFiles(X, Y, dir_name):
     os.mkdir(dir_name)

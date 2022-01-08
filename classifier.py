@@ -70,8 +70,8 @@ def nn_train(model, X_train, Y_train, X_valid, Y_valid, epochs=100, lr = 0.1, va
 
             if debug:
                 print(f'[INFO] Epoch: {epoch+1}/{epochs}\n',
-                    f"Training Loss: {train_loss:0.3f}, training accuracy {train_accuracy*100:0.3f}%",
-                    f"validation Loss: {valid_loss:0.3f}, validation accuracy {valid_accuracy*100:0.3f}%")
+                    f"Training Loss: {train_loss:0.3f}, training accuracy {train_accuracy[0]*100:0.3f}%",
+                    f"validation Loss: {valid_loss:0.3f}, validation accuracy {valid_accuracy[0]*100:0.3f}%")
     
     # with open("evaluation.json", "w") as outfile:
     #     json.dump(best_evaluation, outfile)
@@ -93,7 +93,7 @@ def nn_predict(model, features):
 
 def nn_accuracy(predictions, labels):
     correct = (predictions == labels).sum().item()
-    return correct/len(labels)
+    return correct/len(labels), correct
 
 def predict(model, features):
     return nn_predict(model, features)

@@ -99,5 +99,14 @@ def localPhaseQuantization(img, winSize=3):
     return LPQdesc
 
 def extractFeaturesFromImage(img):
-    features = localPhaseQuantization(img)
+    featuresLPQ = localPhaseQuantization(img)
+        
+    featuresNo = 36
+#         _, diacritics =  diacriticsSegmentationClustering(img)
+#         featuresH = np.zeros((featuresNo))
+        
+#         if diacritics.sum() != diacritics.size:
+    featuresH = extract_EOH(img, featuresNo)
+    
+    features = np.hstack((featuresH, featuresLPQ))
     return features

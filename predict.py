@@ -8,7 +8,7 @@ import torch
 import time
 import numpy as np
 
-featuresNo = 255
+featuresNo = 291
 
 def process_data(input_path, output_path):
     try:

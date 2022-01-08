@@ -26,7 +26,7 @@ def load_data():
     x = []
     y = []
     for classNum in range(1, 10):
-        for filename in sorted(glob.glob(f'ACdata_base/{classNum}/*.jpg')):
+        for filename in sorted(os.listdir(f'ACdata_base/{classNum}/')):
             # img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
             x.append(filename)
             y.append(classNum)
